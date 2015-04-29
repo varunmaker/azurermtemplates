@@ -3,22 +3,40 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "This is the name of the your storage account"
+            }
         },
 		"vmDnsName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "This is the unique DNS name of the for the public IP for your VM"
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "This is the the username you wish to assign to your VMs admin account"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "This is the the password you wish to assign to your VMs admin account"
+            }
         },
         "mySqlPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for your mySQL account"
+            }
         },
         "vmSize": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Size of VM"
+            }
         }
     },
     "variables": {
@@ -134,7 +152,14 @@
                         "sku" : "[variables('imageSKU')]", 
                         "version":"[variables('imageVersion')]" 
                     }, 
-                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                    "osDisk" : {
+                        "name": "osdisk1",
+                        "vhd": {
+                           "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/','osdisk1.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
