@@ -4,7 +4,6 @@
     "parameters" : {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue" : "uniqueStorageAccountName",
             "metadata": {
                 "description": "This is the name of the your storage account"
             }
