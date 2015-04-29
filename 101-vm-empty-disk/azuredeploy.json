@@ -170,7 +170,8 @@
                         "lun" : 0,
                         "vhd":{
                             "Uri" : "[variables('dataDisk1VhdName')]"
-                        }
+                        },
+                        "createOption": "Empty"
                     }
                 ],
                 "osDisk" : {
