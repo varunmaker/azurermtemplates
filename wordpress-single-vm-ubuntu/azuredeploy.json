@@ -25,9 +25,9 @@
         "nicName": "VMNic",
         "addressPrefix": "10.0.0.0/16",
         "imagePublisher": "RightScaleLinux", 
-52      "imageVersion": "latest", 
-53      "imageSKU": "12.04", 
-54      "imageOffer": "RightImage-Ubuntu",
+        "imageVersion": "latest",
+        "imageSKU": "12.04",
+        "imageOffer": "RightImage-Ubuntu",
         "subnetName": "Subnet-1",
         "subnetPrefix": "10.0.0.0/24",
 	    "storageAccountType": "Standard_LRS",
@@ -129,11 +129,11 @@
                 },
                 "storageProfile": {
                     "imageReference": { 
-160                     "publisher": "[variables('imagePublisher')]", 
-161                     "offer": "[variables('imageOffer')]", 
-162                     "sku" : "[variables('imageSKU')]", 
-163                     "version":"[variables('imageVersion')]" 
-164                 }, 
+                        "publisher": "[variables('imagePublisher')]", 
+                        "offer": "[variables('imageOffer')]", 
+                        "sku" : "[variables('imageSKU')]", 
+                        "version":"[variables('imageVersion')]" 
+                    }, 
                     "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
                 },
                 "networkProfile": {
