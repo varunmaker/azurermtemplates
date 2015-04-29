@@ -5,11 +5,8 @@
         "newStorageAccountName": {
             "value": "storage"
         },
-        "location": {
-            "value": "West US"
-        },
         "vmDnsName": {
-            "value": "dnsname"
+            "value": "vmdnsname"
         },
         "adminUsername": {
             "value": "azureuser"
@@ -19,6 +16,9 @@
         },
         "mySqlPassword": {
             "value": "password"
+        },
+        "vmSize": {
+            "value": "Standard_D2"
         }
    }
 }

@@ -3,16 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "type": "string",
-            "defaultValue": "uniqueStorageName"
-        },
-        "location": {
-            "type": "string",
-            "defaultValue": "West US"
+            "type": "string"
         },
 		"vmDnsName": {
-            "type": "string",
-            "defaultValue": "uniqueDNS"
+            "type": "string"
         },
         "adminUsername": {
             "type": "string"
@@ -22,22 +16,27 @@
         },
         "mySqlPassword": {
             "type": "securestring"
+        },
+        "vmSize": {
+            "type": "string"
         }
     },
     "variables": {
         "nicName": "VMNic",
         "addressPrefix": "10.0.0.0/16",
+        "imagePublisher": "RightScaleLinux", 
+52      "imageVersion": "latest", 
+53      "imageSKU": "12.04", 
+54      "imageOffer": "RightImage-Ubuntu",
         "subnetName": "Subnet-1",
         "subnetPrefix": "10.0.0.0/24",
-        "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
-	   "storageAccountType": "Standard_LRS",
+	    "storageAccountType": "Standard_LRS",
+        "location": "West US",
         "publicIPAddressName": "publicIP",
         "publicIPAddressType": "Dynamic",
         "vmStorageAccountContainerName": "vhds",
         "vmName": "[parameters('vmDnsName')]",
-        "vmSize": "Standard_A0",
         "virtualNetworkName": "WPVNET",
-        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
     },
@@ -45,17 +44,17 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('newStorageAccountName')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('location')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[variables('location')]",
             "properties": {
                 "accountType": "[variables('storageAccountType')]"
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('publicIPAddressName')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "properties": {
                 "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
                 "dnsSettings": {
@@ -64,10 +63,10 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('virtualNetworkName')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -85,10 +84,10 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
@@ -111,17 +110,17 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('vmName')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('vmSize')]"
+                    "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
                     "computername": "[variables('vmName')]",
@@ -129,9 +128,12 @@
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
-                    "sourceImage": {
-                        "id": "[variables('sourceImageName')]"
-                    },
+                    "imageReference": { 
+160                     "publisher": "[variables('imagePublisher')]", 
+161                     "offer": "[variables('imageOffer')]", 
+162                     "sku" : "[variables('imageSKU')]", 
+163                     "version":"[variables('imageVersion')]" 
+164                 }, 
                     "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
                 },
                 "networkProfile": {
@@ -146,8 +148,8 @@
 		{
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/newuserscript')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('location')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
