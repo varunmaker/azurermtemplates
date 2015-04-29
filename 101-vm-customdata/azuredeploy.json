@@ -107,7 +107,7 @@
         "name": "[variables('nicName')]",
         "location": "[variables('location')]",
         "dependsOn": [
-            "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]",
+            "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
             "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
         ],
         "properties": {
@@ -117,7 +117,7 @@
                 "properties": {
                     "privateIPAllocationMethod": "Dynamic",
                     "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
                     },
                     "subnet": {
                         "id": "[variables('subnet1Ref')]"
@@ -151,10 +151,10 @@
             },
             "storageProfile": {
                 "imageReference": {
-                    "publisher": "[parameters('imagePublisher')]",
-                    "offer": "[parameters('imageOffer')]",
-                    "sku" : "[parameters('imageSKU')]",
-                    "version":"[parameters('imageVersion')]"
+                    "publisher": "[variables('imagePublisher')]",
+                    "offer": "[variables('imageOffer')]",
+                    "sku" : "[variables('imageSKU')]",
+                    "version":"[variables('imageVersion')]"
                 },
                 "osDisk" : {
                     "name": "osdisk1",
