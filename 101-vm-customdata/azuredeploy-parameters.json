@@ -9,7 +9,7 @@
         "value": ""
     },
     "customData" : {
-        "value" : "base64EncodedCustomData"
+        "value" : "c2FtcGxlZGF0YQ=="
     },
     "dnsNameForPublicIP": {
         "value": "uniqueDnsNameForPublicIP"
