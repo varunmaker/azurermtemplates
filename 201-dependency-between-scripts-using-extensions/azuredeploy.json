@@ -4,75 +4,70 @@
     "parameters" : {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue" : "uniquestorageaccountName"
+            "metadata": {
+                "description": "This is the name of the your storage account"
+            }
         },
         "dnsNameForPublicIP" : {
-            "type" : "string",
-            "defaultValue": "uniquednsnameforpublicip"
+            "type": "string",
+            "metadata": {
+                "description": "This is the unique DNS name of the for the public IP for your VM"
+            }
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "This is the the username you wish to assign to your VMs admin account"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
-        },
-        "vmSourceImageName": {
-            "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
-        },
-        "location": {
-            "type": "String",
-            "defaultValue" : "West US"
+            "type": "securestring",
+            "metadata": {
+                "description": "This is the the password you wish to assign to your VMs admin account"
+            }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0"
-        },
-        "publicIPAddressName": {
-            "type": "string",
-            "defaultValue" : "myPublicIP"
-        },
-        "vmName": {
-            "type": "string",
-            "defaultValue" : "myLinuxVM"
-        },
-        "virtualNetworkName":{
-            "type" : "string",
-            "defaultValue" : "myVNET"
-        },
-        "nicName":{
-            "type" : "string",
-            "defaultValue":"myNIC"
+            "metadata": {
+                "description": "Size of VM"
+            }
         }
     },
     "variables": {
+        "location": "West US",
         "addressPrefix":"10.0.0.0/16",
+        "imagePublisher": "RightScaleLinux", 
+        "imageVersion": "latest",
+        "imageSKU": "12.04",
+        "imageOffer": "RightImage-Ubuntu",
         "subnet1Name": "Subnet-1",
-        "subnet2Name": "Subnet-2",
         "subnet1Prefix" : "10.0.0.0/24",
-        "subnet2Prefix" : "10.0.1.0/24",
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
+        "publicIPAddressName": "myPublicIP",
         "storageAccountType": "Standard_LRS",
-        "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
-        "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "vmName": "myVM",
+        "virtualNetworkName": "myVNET",
+        "nicName": "myVMNic",
+        "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
     },
+
     "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
-      "apiVersion": "2014-12-01-preview",
-      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[variables('location')]",
       "properties": {
         "accountType": "[variables('storageAccountType')]"
       }
     },
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/publicIPAddresses",
-        "name": "[parameters('publicIPAddressName')]",
-        "location": "[parameters('location')]",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[variables('location')]",
         "properties": {
             "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
             "dnsSettings": {
@@ -81,10 +76,10 @@
         }
     },
     {
-      "apiVersion": "2014-12-01-preview",
+      "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -97,24 +92,18 @@
             "properties" : {
                 "addressPrefix": "[variables('subnet1Prefix')]"
             }
-          },
-          {
-            "name": "[variables('subnet2Name')]",
-            "properties" : {
-                "addressPrefix": "[variables('subnet2Prefix')]"
-            }
           }
         ]
       }
     },
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
-        "name": "[parameters('nicName')]",
-        "location": "[parameters('location')]",
+        "name": "[variables('nicName')]",
+        "location": "[variables('location')]",
         "dependsOn": [
-            "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
         ],
         "properties": {
             "ipConfigurations": [
@@ -123,7 +112,7 @@
                 "properties": {
                     "privateIPAllocationMethod": "Dynamic",
                     "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
                     },
                     "subnet": {
                         "id": "[variables('subnet1Ref')]"
@@ -134,33 +123,43 @@
         }
     },
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Compute/virtualMachines",
-        "name": "[parameters('vmName')]",
-        "location": "[parameters('location')]",
+        "name": "[variables('vmName')]",
+        "location": "[variables('location')]",
         "dependsOn": [
             "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
-            "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
+            "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
         ],
         "properties": {
             "hardwareProfile": {
                 "vmSize": "[parameters('vmSize')]"
             },
             "osProfile": {
-                "computername": "[parameters('vmName')]",
+                "computername": "[variables('vmName')]",
                 "adminUsername": "[parameters('adminUsername')]",
                 "adminPassword": "[parameters('adminPassword')]"
             },
             "storageProfile": {
-                "sourceImage": {
-                    "id": "[variables('sourceImageName')]"
-                },
-                "destinationVhdsContainer" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                "imageReference": { 
+                     "publisher": "[variables('imagePublisher')]", 
+                     "offer": "[variables('imageOffer')]", 
+                     "sku" : "[variables('imageSKU')]", 
+                     "version":"[variables('imageVersion')]" 
+                }, 
+                "osDisk" : {
+                    "name": "osdisk1",
+                    "vhd": {
+                       "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/','osdisk1.vhd')]"
+                    },
+                    "caching": "ReadWrite",
+                    "createOption": "FromImage"
+                }
             },
             "networkProfile": {
                 "networkInterfaces" : [
                 {
-                    "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
                 }
                 ]
             }
@@ -168,11 +167,11 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'/configuremongo')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('location')]",
+            "name": "[concat(variables('vmName'),'/configuremongo')]",
+            "apiVersion": "2015-05-01-preview",
+            "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
             "properties": {
                 "publisher": "Microsoft.OSTCExtensions",
@@ -188,11 +187,11 @@
         },
       {
           "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('vmName'),'/installmongo')]",
-          "apiVersion": "2014-12-01-preview",
-          "location": "[parameters('location')]",
+          "name": "[concat(variables('vmName'),'/installmongo')]",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[variables('location')]",
           "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'),'/extensions/configuremongo')]"
+              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'),'/extensions/configuremongo')]"
           ],
           "properties": {
               "publisher": "Microsoft.OSTCExtensions",
